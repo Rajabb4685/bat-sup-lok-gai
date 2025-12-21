@@ -22,6 +22,20 @@
     .font-serif { font-family: 'Source Serif 4', serif; }
   </style>
 
+<style>
+  .catalog-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .biz-card{
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 14px;
+    background: white;
+  }
+</style>
+
 </head>
 <!-- Ensure the body has the base font class for the entire document -->
 <body class="bg-secondary font-sans text-gray-800">
@@ -41,4 +55,24 @@
     <a href="support.html" class="hover:underline">Support</a>
   </nav>
 </header>
+<section class="catalog-controls">
+  <input id="searchInput" type="text" placeholder="Search businesses..." />
+  <select id="categorySelect">
+    <option value="">All categories</option>
+    <option value="Restaurant">Restaurant</option>
+    <option value="Beauty">Beauty</option>
+    <option value="Cafe">Cafe</option>
+    <option value="Grocery">Grocery</option>
+  </select>
+  <button id="searchBtn">Search</button>
+</section>
+
+<section id="catalogList" class="catalog-grid"></section>
+
+<p id="catalogStatus"></p>
+
+<script src="./catalog.js"></script>
+
 </body
+
+
