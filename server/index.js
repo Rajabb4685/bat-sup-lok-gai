@@ -13,13 +13,6 @@ const db = openDb();
 app.use(cors());
 app.use(express.json());
 
-// ---- Simple API-key protection for write endpoints ----
-function requireApiKey(req, res, next) {
-  const key = req.header("x-api-key");
-  if (!process.env.ADMIN_API_KEY) return res.status(500).json({ error: "Missing ADMIN_API_KEY" });
-  if (key !== process.env.ADMIN_API_KEY) return res.status(401).json({ error: "Unauthorized" });
-  next();
-}
 
 // ---- Health check ----
 app.get("/api/health", (req, res) => res.json({ ok: true }));
@@ -62,7 +55,7 @@ app.get("/api/businesses/:id", (req, res) => {
 });
 
 // Create
-app.post("/api/businesses", requireApiKey, (req, res) => {
+app.post("/api/businesses", (req, res) => {
   const parsed = BusinessCreateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
@@ -79,7 +72,7 @@ app.post("/api/businesses", requireApiKey, (req, res) => {
 });
 
 // Update
-app.put("/api/businesses/:id", requireApiKey, (req, res) => {
+app.put("/api/businesses/:id", (req, res) => {
   const id = Number(req.params.id);
 
   const existing = db.prepare(`SELECT * FROM businesses WHERE id = ?`).get(id);
@@ -102,7 +95,7 @@ app.put("/api/businesses/:id", requireApiKey, (req, res) => {
 });
 
 // Delete
-app.delete("/api/businesses/:id", requireApiKey, (req, res) => {
+app.delete("/api/businesses/:id", (req, res) => {
   const id = Number(req.params.id);
   const info = db.prepare(`DELETE FROM businesses WHERE id = ?`).run(id);
   if (info.changes === 0) return res.status(404).json({ error: "Not found" });
