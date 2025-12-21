@@ -4,6 +4,15 @@ const searchInput = document.getElementById("searchInput");
 const categorySelect = document.getElementById("categorySelect");
 const searchBtn = document.getElementById("searchBtn");
 
+// ✅ Set your Render API base URL here
+const API_BASE = "https://bat-sup-lok-gai.onrender.com";
+
+// If you want it to use local API when running locally, and Render on GitHub Pages:
+const BASE =
+  window.location.hostname.endsWith("github.io")
+    ? API_BASE
+    : ""; // local dev: same-origin (e.g., http://localhost:3000)
+
 function escapeHtml(str = "") {
   return str.replace(/[&<>"']/g, (c) => ({
     "&": "&amp;",
@@ -61,7 +70,7 @@ async function fetchBusinesses({ search = "", category = "" } = {}) {
   if (search) params.set("search", search);
   if (category) params.set("category", category);
 
-  const url = `/api/businesses${params.toString() ? `?${params.toString()}` : ""}`;
+  const url = `${BASE}/api/businesses${params.toString() ? `?${params.toString()}` : ""}`;
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -72,6 +81,7 @@ async function fetchBusinesses({ search = "", category = "" } = {}) {
   const data = await res.json();
   renderBusinesses(data);
 }
+
 
 function runSearch() {
   fetchBusinesses({
