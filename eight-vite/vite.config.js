@@ -2,6 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: "/",   // ← THIS IS IMPORTANT FOR RENDER
+  base: "/bat-sup-lok-gai/",   // ← THIS IS IMPORTANT FOR RENDER
   plugins: [react()],
 })
