@@ -1,247 +1,95 @@
-// server/index.js
-require("dotenv").config({ path: require("path").join(__dirname, ".env") });
-const dns = require("dns");
-dns.setDefaultResultOrder("ipv4first");
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const { Pool } = require("pg");
 const path = require("path");
+const { Pool } = require("pg");
 
-// Serve your frontend files (HTML/CSS/JS) from /src/*
-app.use("/src", express.static(path.join(__dirname, "..", "src")));
+const app = express(); // ✅ app must be created BEFORE app.use()
 
-// Optional: also allow /about.html (without /src) to work
-app.use(express.static(path.join(__dirname, "..", "src")));
-
-const app = express();
-
-/**
- * CORS:
- * - For simplest “make it work” with GitHub Pages, allow all origins.
- * - If you want to lock it down later, I included a commented whitelist example below.
- */
+// ---------- middleware ----------
 app.use(cors());
-// Example whitelist (optional):
-// app.use(cors({
-//   origin: [
-//     "http://localhost:3000",
-//     "http://localhost:5173",
-//     "https://YOURUSERNAME.github.io"
-//   ]
-// }));
-
 app.use(express.json());
 
-// ---- Postgres (Supabase) connection ----
-if (!process.env.DATABASE_URL) {
-  console.error("Missing DATABASE_URL env var. Set it in server/.env locally and on Render.");
-  process.exit(1);
-}
+// Serve frontend static files
+app.use("/src", express.static(path.join(__dirname, "..", "src")));
+// Optional: allow /about.html (without /src) to work locally
+app.use(express.static(path.join(__dirname, "..", "src")));
 
+// ---------- database ----------
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Supabase needs SSL in production:
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
-async function query(text, params) {
-  return pool.query(text, params);
-}
-
-// ---- Health check ----
+// ---------- routes ----------
 app.get("/api/health", async (req, res) => {
   try {
-    const r = await query("select 1 as ok", []);
-    res.json({ ok: true, db: r.rows[0].ok === 1 });
+    const r = await pool.query("select 1 as ok");
+    res.json({ ok: true, db: r.rows?.[0]?.ok === 1 });
   } catch (e) {
+    console.error("health error:", e);
     res.status(500).json({ ok: false, error: "DB connection failed" });
   }
 });
 
-// ---- Businesses ----
-// GET /api/businesses?category=Restaurant&search=sushi
 app.get("/api/businesses", async (req, res) => {
   try {
-    const { category, search } = req.query;
+    const { search = "", category = "" } = req.query;
 
     const where = [];
     const params = [];
-    let i = 1;
 
     if (category) {
-      where.push(`category = $${i++}`);
-      params.push(String(category));
+      params.push(category);
+      where.push(`category = $${params.length}`);
     }
+
     if (search) {
-      // ILIKE = case-insensitive search in Postgres
-      where.push(`(name ILIKE $${i} OR description ILIKE $${i} OR address ILIKE $${i})`);
-      params.push(`%${String(search)}%`);
-      i++;
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+      where.push(
+        `(name ilike $${params.length - 2} or description ilike $${params.length - 1} or neighborhood ilike $${params.length})`
+      );
     }
 
     const sql = `
-      SELECT
-        id, name, category, description, address, neighborhood, phone, website, instagram,
-        image_url, tags, created_at
-      FROM businesses
-      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
-      ORDER BY created_at DESC
+      select id, name, category, description, address, neighborhood,
+             phone, website, instagram, image_url, tags, created_at
+      from businesses
+      ${where.length ? "where " + where.join(" and ") : ""}
+      order by created_at desc
+      limit 200
     `;
 
-    const { rows } = await query(sql, params);
-    res.json(rows);
+    const result = await pool.query(sql, params);
+    res.json(result.rows);
   } catch (e) {
-    console.error(e);
+    console.error("businesses error:", e);
     res.status(500).json({ error: "Failed to load businesses" });
   }
 });
 
-// GET /api/businesses/:id
-app.get("/api/businesses/:id", async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
-
-    const { rows } = await query(
-      `SELECT id, name, category, description, address, neighborhood, phone, website, instagram, image_url, tags, created_at
-       FROM businesses
-       WHERE id = $1`,
-      [id]
-    );
-
-    if (!rows.length) return res.status(404).json({ error: "Not found" });
-    res.json(rows[0]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to load business" });
-  }
-});
-
-// POST /api/businesses
-app.post("/api/businesses", async (req, res) => {
-  try {
-    const b = req.body || {};
-
-    if (!b.name || !b.category) {
-      return res.status(400).json({ error: "name and category are required" });
-    }
-
-    const tags = Array.isArray(b.tags) ? b.tags : [];
-
-    const { rows } = await query(
-      `INSERT INTO businesses
-        (name, category, description, address, neighborhood, phone, website, instagram, image_url, tags)
-       VALUES
-        ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb)
-       RETURNING id, name, category, description, address, neighborhood, phone, website, instagram, image_url, tags, created_at`,
-      [
-        String(b.name),
-        String(b.category),
-        String(b.description || ""),
-        String(b.address || ""),
-        String(b.neighborhood || ""),
-        String(b.phone || ""),
-        String(b.website || ""),
-        String(b.instagram || ""),
-        String(b.imageUrl || b.image_url || ""),
-        JSON.stringify(tags),
-      ]
-    );
-
-    res.status(201).json(rows[0]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to create business" });
-  }
-});
-
-// PUT /api/businesses/:id
-app.put("/api/businesses/:id", async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
-
-    const b = req.body || {};
-    if (!b.name || !b.category) {
-      return res.status(400).json({ error: "name and category are required" });
-    }
-
-    const tags = Array.isArray(b.tags) ? b.tags : [];
-
-    const { rows } = await query(
-      `UPDATE businesses
-       SET
-         name=$1, category=$2, description=$3, address=$4, neighborhood=$5,
-         phone=$6, website=$7, instagram=$8, image_url=$9, tags=$10::jsonb
-       WHERE id=$11
-       RETURNING id, name, category, description, address, neighborhood, phone, website, instagram, image_url, tags, created_at`,
-      [
-        String(b.name),
-        String(b.category),
-        String(b.description || ""),
-        String(b.address || ""),
-        String(b.neighborhood || ""),
-        String(b.phone || ""),
-        String(b.website || ""),
-        String(b.instagram || ""),
-        String(b.imageUrl || b.image_url || ""),
-        JSON.stringify(tags),
-        id,
-      ]
-    );
-
-    if (!rows.length) return res.status(404).json({ error: "Not found" });
-    res.json(rows[0]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to update business" });
-  }
-});
-
-// DELETE /api/businesses/:id
-app.delete("/api/businesses/:id", async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
-
-    const result = await query(`DELETE FROM businesses WHERE id = $1`, [id]);
-    if (result.rowCount === 0) return res.status(404).json({ error: "Not found" });
-
-    res.status(204).send();
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to delete business" });
-  }
-});
-
-// ---- Submissions (Get Involved form) ----
 app.post("/api/submissions", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
-
     if (!name || !email || !message) {
-      return res.status(400).json({ error: "name, email, and message are required" });
+      return res.status(400).json({ error: "Missing name/email/message" });
     }
 
-    const { rows } = await query(
-      `INSERT INTO submissions (name, email, message)
-       VALUES ($1, $2, $3)
-       RETURNING id, created_at`,
-      [String(name), String(email), String(message)]
+    await pool.query(
+      "insert into submissions (name, email, message) values ($1, $2, $3)",
+      [name, email, message]
     );
 
-    res.status(201).json(rows[0]);
+    res.json({ ok: true });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to submit form" });
+    console.error("submissions error:", e);
+    res.status(500).json({ ok: false, error: "Failed to save submission" });
   }
 });
 
-// ---- Start server ----
-const port = process.env.PORT || 3000;
-app.use(express.static(path.join(__dirname, "..")));
-
-app.listen(port, () => {
-  console.log(`API running on port ${port}`);
-});
+// ---------- start ----------
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
