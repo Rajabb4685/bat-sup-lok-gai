@@ -24,3 +24,7 @@ Thumbs.db
 # build outputs (adjust if you have these)
 dist/
 build/
+
+#files to ignore
+server/data/app.db
+src/output.css

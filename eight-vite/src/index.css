@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.bg-polka {
+  background-color: #2e6f4eff; /* base */
+  background-position: 0 0, 40px 40px;
+}
+
