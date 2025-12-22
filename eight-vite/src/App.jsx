@@ -6,6 +6,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import Catalog from "./Catalog.jsx";
 import Involve from "./Involve.jsx";
 import About from "./About.jsx";
+import Blog from "./Blog.jsx";
 
 export default function App() {
   return (
@@ -170,6 +171,8 @@ export default function App() {
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/involve" element={<Involve />} />
         <Route path="/about" element={<About />} />
+        <Route path="/blog" element={<Blog/>} />
+
 
       </Routes>
 
