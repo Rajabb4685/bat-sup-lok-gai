@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
-  base: "/bat-sup-lok-gai/",
+  base: "/",   // ← THIS IS IMPORTANT FOR RENDER
   plugins: [react()],
 })
