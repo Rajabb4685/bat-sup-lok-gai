@@ -6,6 +6,13 @@ dns.setDefaultResultOrder("ipv4first");
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const path = require("path");
+
+// Serve your frontend files (HTML/CSS/JS) from /src/*
+app.use("/src", express.static(path.join(__dirname, "..", "src")));
+
+// Optional: also allow /about.html (without /src) to work
+app.use(express.static(path.join(__dirname, "..", "src")));
 
 const app = express();
 
@@ -233,7 +240,6 @@ app.post("/api/submissions", async (req, res) => {
 
 // ---- Start server ----
 const port = process.env.PORT || 3000;
-const path = require("path");
 app.use(express.static(path.join(__dirname, "..")));
 
 app.listen(port, () => {

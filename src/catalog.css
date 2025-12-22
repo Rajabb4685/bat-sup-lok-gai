@@ -2,25 +2,8 @@
 .catalog-page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px 60px;
-}
-
-.catalog-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.catalog-title {
-  font-size: 1.9rem;
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.catalog-subtitle {
-  margin: 0;
-  opacity: 0.75;
+  padding: 16px 16px 48px;
+  box-sizing: border-box;
 }
 
 /* ===== Controls ===== */
@@ -29,7 +12,7 @@
   grid-template-columns: 1fr 200px 120px;
   gap: 10px;
   align-items: center;
-  margin: 12px 0 18px;
+  margin: 16px 0 14px;
 }
 
 .catalog-controls input,
@@ -40,6 +23,7 @@
   border: 1px solid rgba(0,0,0,0.12);
   outline: none;
   background: #fff;
+  box-sizing: border-box;
 }
 
 .catalog-controls input:focus,
@@ -68,29 +52,34 @@
 }
 
 /* ===== Grid ===== */
-.catalog-grid{
-  display:grid;
+.catalog-grid {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
 
 /* ===== Cards ===== */
-.biz-card{
+.biz-card {
   border: 1px solid rgba(0,0,0,0.10);
   border-radius: 18px;
   padding: 14px;
   background: #fff;
   box-shadow: 0 10px 25px rgba(0,0,0,0.06);
   transition: transform 120ms ease, box-shadow 120ms ease;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.biz-card:hover{
+.biz-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 34px rgba(0,0,0,0.10);
 }
 
-.biz-img{
-  width:100%;
+.biz-img {
+  width: 100%;
   border-radius: 14px;
   aspect-ratio: 16/9;
   object-fit: cover;
@@ -98,32 +87,56 @@
   background: #f2f2f2;
 }
 
-.biz-title{
+.biz-title {
   font-size: 1.05rem;
   font-weight: 750;
   margin: 2px 0 6px;
 }
 
-.biz-meta{
+.biz-meta {
   font-size: 0.9rem;
   opacity: 0.75;
   margin: 0 0 10px;
 }
 
-.biz-desc{
+.biz-desc {
   margin: 0;
   line-height: 1.35;
   opacity: 0.9;
 }
 
-.biz-links{
+/* content area that flexes so actions stay pinned at bottom */
+.biz-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* tags */
+.biz-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.biz-tag {
+  font-size: 0.78rem;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.03);
+}
+
+/* links */
+.biz-links {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
   flex-wrap: wrap;
 }
 
-.biz-links a{
+.biz-links a {
   text-decoration: none;
   padding: 7px 10px;
   border-radius: 999px;
@@ -133,25 +146,50 @@
   font-size: 0.85rem;
 }
 
-.biz-links a:hover{
+.biz-links a:hover {
   background: rgba(0,0,0,0.06);
 }
 
-/* ===== Tags ===== */
-.biz-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap: 6px;
-  margin-top: 10px;
+/* Clamp long text so cards remain consistent height */
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.biz-tag{
-  font-size: 0.78rem;
-  border: 1px solid rgba(0,0,0,0.10);
-  border-radius: 999px;
-  padding: 4px 8px;
-  background: rgba(0,0,0,0.03);
+/* Expanded state removes clamp */
+.biz-card.expanded .clamp-3 {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
+
+/* More/Less button pinned bottom-right */
+.biz-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.biz-more {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.03);
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 0.85rem;
+}
+
+.biz-more:hover {
+  background: rgba(0,0,0,0.08);
+}
+
+.biz-actions.hidden {
+  display: none;
+}
+
 
 /* ===== Mobile ===== */
 @media (max-width: 700px) {
@@ -159,3 +197,4 @@
     grid-template-columns: 1fr;
   }
 }
+
