@@ -7,6 +7,7 @@ import Catalog from "./Catalog.jsx";
 import Involve from "./Involve.jsx";
 import About from "./About.jsx";
 import Blog from "./Blog.jsx";
+import Support from "./Support.jsx";
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
 
         <nav className="flex space-x-4 md:space-x-6 order-3">
           <Link to="/involve" className="hover:underline">Get Involved</Link>
-          <Link to="/support" className="hover:underline">Support</Link>
+          <Link to="/support" className="hover:underline">Explore</Link>
         </nav>
       </header>
 
@@ -172,6 +173,7 @@ export default function App() {
         <Route path="/involve" element={<Involve />} />
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog/>} />
+        <Route path="/support" element={<Support />} />
 
 
       </Routes>
