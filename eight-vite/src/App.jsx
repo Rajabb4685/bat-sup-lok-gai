@@ -99,14 +99,15 @@ export default function App() {
                 </div>
 
                 {/* Item 2 */}
-                <div className="grid md:grid-cols-2 gap-12 items-start">
+                <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
+
+                  {/* LEFT SIDE — TEXT */}
                   <div className="space-y-4">
                     <h4 className="text-2xl font-serif font-semibold text-primary">
-                      Ceasar’s Bay Fart Walks
+                      Ji Bei Chuan Noodles 季北川
                     </h4>
                     <p className="text-sm leading-relaxed">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                      eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                      Known for hand-pulled noodles and bold northern Chinese flavors. The restaurant is casual and popular for quick, filling meals.
                     </p>
 
                     <div className="flex justify-start md:justify-end pt-4">
@@ -116,7 +117,15 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="w-full h-64 bg-gray-300 rounded-lg shadow-md" />
+                  {/* RIGHT SIDE — IMAGE */}
+                  <div className="w-full h-64 rounded-lg shadow-md overflow-hidden">
+                    <img
+                      src="/noodle.jpg"
+                      alt="Ji Bei Chuan Noodles"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
                 </div>
               </section>
 
@@ -163,7 +172,7 @@ export default function App() {
 
       </Routes>
 
-      {/* GLOBAL FOOTER — appears on EVERY page */}
+      {/* GLOBAL FOOTER */}
       <footer className="bg-primary text-cream py-6 px-10 text-sm flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <p className="font-serif text-xl">bat · sup · lok · gai</p>
 
