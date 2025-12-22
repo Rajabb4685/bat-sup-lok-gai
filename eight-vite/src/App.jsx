@@ -5,6 +5,7 @@ import "./index.css";
 import { Routes, Route, Link } from "react-router-dom";
 import Catalog from "./Catalog.jsx";
 import Involve from "./Involve.jsx";
+import About from "./About.jsx";
 
 export default function App() {
   return (
@@ -89,11 +90,10 @@ export default function App() {
 
                   <div className="space-y-4">
                     <h4 className="text-2xl font-serif font-semibold text-primary">
-                      Max Funland Grand Opening
+                      Nai Brothers' Bakery 蘇老闆
                     </h4>
                     <p className="text-sm leading-relaxed">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                      eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                      Focuses on casual Chinese street-style food. The restaurant attracts customers looking for fast, flavorful meals.
                     </p>
                   </div>
                 </div>
@@ -169,6 +169,7 @@ export default function App() {
         {/* OTHER PAGES */}
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/involve" element={<Involve />} />
+        <Route path="/about" element={<About />} />
 
       </Routes>
 
