@@ -152,11 +152,17 @@
 
 /* Clamp long text so cards remain consistent height */
 .clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+
+  /* WebKit clamp (works in Chrome/Safari/Edge) */
+  -webkit-line-clamp: 3;
+
+  /* Standard property (some linters want it) */
+  line-clamp: 3;
 }
+
 
 /* Expanded state removes clamp */
 .biz-card.expanded .clamp-3 {
