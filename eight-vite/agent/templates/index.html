@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bat · sup · lok · gai | Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#b04547',   /* The Red from your site */
+                        secondary: '#ffeb3b', /* The Yellow from your site */
+                        cream: '#fffde7',     /* The Cream/White from your site */
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans text-gray-800">
+
+    <header class="bg-primary text-secondary py-3 px-8 flex flex-col md:flex-row justify-between items-center text-sm space-y-2 md:space-y-0">
+        <nav class="flex space-x-4 md:space-x-6 order-2 md:order-1">
+            <a href="#" class="hover:underline">About Us</a>
+            <a href="#" class="hover:underline">Catalog</a>
+            <a href="#" class="hover:underline">Blog</a>
+        </nav>
+
+        <a href="/" class="text-xl font-serif order-1 md:order-2 text-secondary">
+            bat · sup · lok · gai
+        </a>
+
+        <nav class="flex space-x-4 md:space-x-6 order-3">
+            <a href="#" class="hover:underline">Get Involved</a>
+            <a href="#" class="hover:underline">Support</a>
+        </nav>
+    </header>
+
+    <section class="bg-primary text-secondary py-16 px-10">
+        <div class="max-w-4xl mx-auto text-center space-y-6">
+            <h2 class="text-4xl md:text-6xl font-serif font-semibold">
+                86th Street Assistant
+            </h2>
+            <p class="text-sm uppercase tracking-widest opacity-80">
+                Ask anything about Bensonhurst's Chinatown
+            </p>
+            
+            <div class="bg-cream p-6 md:p-10 rounded-lg shadow-xl text-gray-800 text-left mt-8">
+                <p class="text-primary font-serif font-bold text-xl mb-4">What are you looking for today?</p>
+                
+                <div class="flex flex-col md:flex-row gap-3">
+                    <input type="text" id="question" 
+                        class="flex-grow p-4 rounded-md border-2 border-gray-200 focus:border-primary outline-none transition"
+                        placeholder="e.g. Where is the best Dim Sum on 86th?">
+                    <button onclick="askAI()" 
+                        class="bg-primary text-secondary font-bold px-8 py-4 rounded-md hover:opacity-90 transition">
+                        ASK AI
+                    </button>
+                </div>
+
+                <div id="response" class="mt-8 p-6 bg-white rounded-md border-l-8 border-primary hidden animate-fade-in">
+                    <span class="text-xs font-bold text-primary uppercase tracking-tighter">AI Recommendation:</span>
+                    <div id="answerText" class="mt-2 text-lg leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="h-16 bg-primary shadow-lg -skew-y-2 -translate-y-8"></div>
+
+    <footer class="bg-primary text-secondary py-10 px-10 text-sm flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mt-20">
+        <p class="font-serif text-2xl">bat · sup · lok · gai</p>
+        <div class="flex space-x-6 text-base">
+            <a href="#" class="hover:underline">Get Involved</a>
+            <a href="#" class="hover:underline">Support</a>
+        </div>
+    </footer>
+
+    <script>
+        async function askAI() {
+            const question = document.getElementById('question').value;
+            const responseDiv = document.getElementById('response');
+            const answerText = document.getElementById('answerText');
+            
+            if(!question) return;
+
+            responseDiv.classList.remove('hidden');
+            answerText.innerHTML = "<span class='animate-pulse text-gray-400'>Consulting the neighborhood experts...</span>";
+
+            try {
+                const res = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                const data = await res.json();
+                answerText.innerText = data.answer;
+            } catch (error) {
+                answerText.innerText = "Error: Make sure your Python backend is running!";
+            }
+        }
+    </script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+    </style>
+</body>
+</html>
