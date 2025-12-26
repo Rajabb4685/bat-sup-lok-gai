@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({  
   plugins: [react()],
-  base: "/bat-sup-lok-gai/",
+  base: "/bat-sup-lok-gai/eight-vite/",
 })
